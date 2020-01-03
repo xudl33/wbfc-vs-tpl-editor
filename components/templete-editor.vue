@@ -20,7 +20,7 @@
                 <slot :name="'form_group_' + item.group.name" :data='item' v-if="isVisible(item.group.visible)">
                   <el-divider>{{item.group.label}}</el-divider>
                 </slot>
-                <div v-for="(gm, i) in item.elems" :key="'tplForm_group_' + i">
+                <div v-for="(gm, i) in item.elems" :key="'tplForm_group_' + index + '_' + i">
                   <FormItemEditor :binForm="value" :value="gm" :visable="isVisible(gm.visible)">
                     <template :slot="'form_item_' + gm.name">
                       <slot :name="'form_item_' + gm.name" :data="gm"></slot>

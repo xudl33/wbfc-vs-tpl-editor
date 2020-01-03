@@ -1,14 +1,14 @@
 {
   "name": "wbfc-vs-tpl-editor",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "一个基于Element UI的可视化模版编辑器框架",
   "author": "xudalin <xudl@wisea.com.cn>",
   "private": false,
   "files": [
-    "src",
-    "components"
+    "components",
+    "index.js"
   ],
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "demo": "webpack --progress --config build/webpack.package.js",
