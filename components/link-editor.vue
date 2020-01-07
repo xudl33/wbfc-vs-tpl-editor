@@ -124,16 +124,20 @@ export default {
     }
   },
   methods: {
-    initDef() {
-      if (this.defVal) {
+    initDef(val) {
+      if (val) {
         var def = {};
         def[this.mergePropMapping.href] = '#';
         def[this.mergePropMapping.target] = '_self';
-        this.value = Object.assign(def, this.defVal);
+        this.value = Object.assign(def, val);
       }
     },
+    setValue(val){
+      this.initDef(val);
+    },
     handleOpen() {
-      this.initDef();
+      this.initDef(this.defVal);
+      this.$emit('open', event, this);
     },
     handleClose() {
       this.dialogFlag = false;

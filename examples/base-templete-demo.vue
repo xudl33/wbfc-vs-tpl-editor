@@ -20,6 +20,7 @@
       <div>评分值: {{value.rateVal}}</div>
       <div>颜色选择器值: {{value.colorPickerVal}}</div>
       <div>穿梭框值: {{value.transferVal}}</div>
+      <div>链接href值: {{value.linkVal}}</div>
     </div>
     <div>
       <div>模板数据:</div>

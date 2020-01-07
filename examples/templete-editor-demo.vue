@@ -287,7 +287,7 @@ export default {
         label: '颜色选择器',
         defVal: '#66b1ff',
       }, {
-        type: 'transfer',
+        type: 'transfer',                            
         name: 'transferVal',
         label: '穿梭框',
         defVal: ['0', '1'],
@@ -296,6 +296,28 @@ export default {
             { key: '1', label: '选项1' },
             { key: '2', label: '选项2' }
           ]
+        }
+      }, {
+        type: 'Link-editor',
+        name: 'linkVal',
+        label: '链接',
+        defVal: {link: '1111', text: '123212', type: '_blank'},
+        attrs: {
+          propMapping: { // 不是默认结构的数据，需要对表单进行映射转换
+             href: 'link',
+             label: 'text',
+             target: 'type'
+          },
+          submitDialog: (val) => {
+            // 回显
+            this.$set(this.tplModel, 'linkVal', val);
+          }
+        },
+        events:{
+          open: (e, linkEditor) => {
+            // 默认赋值
+            linkEditor.setValue(this.tplModel.linkVal);
+          }
         }
       }]
     };

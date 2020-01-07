@@ -74,6 +74,8 @@
         <el-color-picker v-else-if="'color-picker' === itemType" v-bind="value.attrs" v-model="binForm[value.name]" v-on="value.events?value.events:null"></el-color-picker>
         <!-- 穿梭框 -->
         <el-transfer v-else-if="'transfer' === itemType" v-bind="value.attrs" v-model="binForm[value.name]" v-on="value.events?value.events:null"></el-transfer>
+        <!-- 链接 -->
+        <LinkEditor v-else-if="'link-editor' === itemType" v-bind="value.attrs" v-model="binForm[value.name]" v-on="value.events?value.events:null"></LinkEditor>
         <!-- 完全自定义组件 -->
         <!-- <div v-else-if="'custom' === itemType" :data="value"></div> -->
         <!-- 自定义组件 html原生的控件的绑定 都需要用props修饰器才能正常使用 可以参考 https://cn.vuejs.org/v2/api/#v-bind -->

@@ -1,5 +1,5 @@
 <script type="text/javascript">
-/*import test from '../../examples/test'*/
+import initEditors from './init-editors'
 var diyComponents = {};
 var addComponent = function(com){
   for(var i in com){
@@ -17,22 +17,16 @@ export default {
   methods:{
     addComponent: addComponent
   },
-  /*beforeCreate(){
-    diyComponents = 
-    diyComponents = this.diy;
-  },*/
   install(Vue, options){
     //console.log(options);
     //console.log(diyComponents);
     this.options = Object.assign({}, options);
     Vue.$formItemComponentsManager = this;
     Vue.$formItemComponentsManager.addComponent = addComponent;
-    /*this.diyComponents = this.options.components;*/
+    // initEditors添加到编辑器全局组件
+    addComponent(initEditors);
+    // 添加自定义组件到编辑器
     addComponent(this.options.components);
-/*    for(var i in this.options.components){
-       diyComponents[i] = this.options.components[i];
-    }*/
-    //console.log(diyComponents);
   }
 }
 </script>

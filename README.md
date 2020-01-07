@@ -233,6 +233,230 @@ export default {
 
 ```
 
+## 特有组件库
+### link-editor 链接编辑器
+它是一个弹出层式的表单交互式组件,必须在弹出的对话框点击确定按钮时手动处理`value`。当编辑器元素中包含有链接，可以直接使用链接编辑器组件。它必须要实现一个`submitDialog`函数，用来处理对话框关闭时的操作，一般这个函数可以做编辑器中组件的回显，如果需要默认值，只要实现events的`open`事件,调用`setValue`函数即可。
+```javascript
+export default {
+  data() {
+    return {
+      tplFormElems: [{
+        type: 'link-editor',
+        name: 'linkVal',
+        label: '链接',
+        defVal: {href: 'https://github.com/xudl33/wbfc-vs-tpl-editor', label: '链接文字', target: '_blank'},
+        attrs: {
+          submitDialog: (val) => {
+            // 回显
+            this.$set(this.tplModel, 'linkVal', val);
+          }
+        },
+        events:{
+          open: (e, linkEditor) => {
+            // 默认赋值
+            linkEditor.setValue(this.tplModel.linkVal);
+          }
+        }
+      }]
+    };
+  },
+  ...
+}
+```
+
+#### Attributes
+参数|说明|类型|必填|可选值|默认值
+---|---|---|---|---|---
+dialogProps|编辑对话框属性 具体参数请参考 [Element UI Dialog](https://element.eleme.cn/#/zh-CN/component/dialog)|Object|false|-|{width: '40%'}
+editorView|编辑器链接属性 它会映射为编辑器的表单元素显示出来 具体参数请参考 [Element UI Link](https://element.eleme.cn/#/zh-CN/component/link)|Object|false|-|{type: 'primary', underline: false, href: '#'}
+viewLabel|编辑器链接文字|String|false|-|'编辑'
+dialogTitle|编辑对话框标题 (独立属性，即使设置了dialogProps.title也无效)|String|false|-|'-编辑链接-'
+propMapping|编辑器表单映射 默认的表单属性为{label: '显示文字', href: '超链接', target: '跳转类型'} 如果你的模型并不是这种结构，可以设置该项进行映射转换|Object|false|-|{label: 'label',href: 'href',target: 'target'}
+defVal|表单默认值 每次弹出对话框时的初始值，它只是一个Object，不会直接绑定到编辑器模型中，如果需要从编辑器模型中传递默认值，必须要实现open事件，再调用`setValue`函数手动赋值|Object|false|-|{}
+formProps|编辑器表单属性 [Element UI - 表单](https://element.eleme.cn/#/zh-CN/component/form)|Object|false|-|{rules: {label: [{ required: true, message: '请输入显示文字', trigger: 'blur' }],href: [{ required: true, message: '请输入链接', trigger: 'blur' }],target: [{ required: true, message: '请选择跳转类型', trigger: 'blur' }]}}
+submitDialog|对话框点击确定按钮的回调函数 必须通过改函数手动处理编辑器表单值的对应关系|Function|true|-|() => {}
+
+#### Slotes
+插槽名|说明|参数
+---|---|---
+view-label|显示文字|linkEditor:this
+footer|底部按钮|linkEditor:this
+
+#### propMapping 编辑器表单映射
+```javascript
+export default {
+  data() {
+    return {
+      tplFormElems: [{
+        type: 'link-editor',
+        name: 'linkVal',
+        label: '链接',
+        defVal: {link: 'https://github.com/xudl33/wbfc-vs-tpl-editor', text: '链接文字', type: '_blank'},
+        attrs: {
+          propMapping: { // 不是默认结构的数据，需要对表单进行映射转换
+             href: 'link',
+             label: 'text',
+             target: 'type'
+          }
+        },
+        events:{
+          open: (e, linkEditor) => {
+            // 默认赋值
+            linkEditor.setValue(this.tplModel.linkVal);
+          }
+        }
+      }]
+    };
+  },
+  ...
+
+```
+
+
+### list-sort-editor 列表排序编辑器
+它是一个可以直接对列表进行排序操作的编辑器。默认四个按钮，【向上移动】【向下移动】【移动到最前】【移动到最后】。它不是默认的编辑器全局组件，使用前需要`import`到你的vue中。
+```vue
+<template>
+  <div>
+          <el-table ref="multipleTable" :data="tplModel.categoryList" style="width:100%">
+            <el-table-column type="index">
+            </el-table-column>
+            <el-table-column prop="text" label="分类名">
+            </el-table-column>
+            <el-table-column label="排序">
+              <template slot-scope="scope">
+                <ListSortEditor v-model="tplModel.categoryList" :index="scope.$index"/>
+              </template>
+            </el-table-column>
+          </el-table>
+  </div>
+</template>
+<script type="text/javascript">
+import ListSortEditor from 'wbfc-vs-tpl-editor/components/list-sort-editor'
+export default {
+  components: {
+    ListSortEditor,
+  },
+  data:{
+    return {
+    tplModel: {
+        categoryList: [{
+            text: '分类1',
+            href: '/'
+          },
+          {
+            text: '分类2',
+            href: '/'
+          },
+          {
+            text: '分类3',
+            href: '/'
+          },
+          {
+            text: '分类4',
+            href: '/'
+          },
+          {
+            text: '分类5',
+            href: '/'
+          }
+        ]
+    }
+   };
+  }
+  ...
+}
+</script>
+```
+#### Attributes
+参数|说明|类型|必填|可选值|默认值
+---|---|---|---|---|---
+value|需要排序的列表|Array|true|-|-
+index|当前值索引|int|true|-|-
+btns|排序按钮|Object|false|-|{up: {type: 'text',icon: 'el-icon-arrow-up',title: '向上移动',enabled: true},down: {type: 'text',title: '向下移动',icon: "el-icon-arrow-down",enabled: true},top: {type: 'text',title: '移动到最前',icon: "el-icon-top",enabled: true},bottom: {type: 'text',title: '移动到最后',icon: "el-icon-bottom",enabled: true}}
+loop|是否循环排序 默认列表的第一个点击【向上移动】不会有效果，列表的最后一个点击【向下移动】也不会有效果。 如果开启该项，列表的第一个点击【向上移动】会变成最后一个，列表的最后一个点击【向下移动】会变成第一个|Boolean|false|true/false|false
+
+#### btns
+参数|说明|类型|必填|可选值|默认值
+---|---|---|---|---|---
+type|按钮类型 具体参数请参考 [Element UI Button](https://element.eleme.cn/#/zh-CN/component/button)|String|true|-|text
+icon|按钮图标 具体参数请参考 [Element UI Icon](https://element.eleme.cn/#/zh-CN/component/icon)|String|true|-|-
+title|按钮鼠标悬停提示|String|false|-|-
+enabled|按钮是否可用 如果为false则该按钮不可见|Boolean|true|true/false|true
+
+#### Slotes
+插槽名|说明|参数
+---|---|---
+up|向上移动|index:index
+down|向下移动|index:index
+top|移动到最前|index:index
+bottom|移动到最后|index:index
+
+
+#### 不显示按钮
+设置`btns`属性可以控制按钮是否可见。例： 不显示【移动到最前】【移动到最后】两个按钮。
+```vue
+<template>
+  <div>
+          <el-table ref="multipleTable" :data="tplModel.categoryList" style="width:100%">
+            <el-table-column type="index">
+            </el-table-column>
+            <el-table-column prop="text" label="分类名">
+            </el-table-column>
+            <el-table-column label="排序">
+              <template slot-scope="scope">
+                <ListSortEditor v-model="tplModel.categoryList" :index="scope.$index" :btns="{top:{enabled:false}, bottom:{enabled:false}}"/>
+              </template>
+            </el-table-column>
+          </el-table>
+  </div>
+</template>
+<script type="text/javascript">
+import ListSortEditor from 'wbfc-vs-tpl-editor/components/list-sort-editor'
+export default {
+  components: {
+    ListSortEditor,
+  }
+  ...
+}
+</script>
+```
+
+#### 自定义按钮
+在一些特殊场合下，默认的样式并不能满足需求，这时可以自定义操作按钮。例：自定义【向上移动】和【向下移动】同时不显示【移动到最前】【移动到最后】两个按钮。
+```vue
+<template>
+  <div>
+          <el-table ref="multipleTable" :data="tplModel.categoryList" style="width:100%">
+            <el-table-column type="index">
+            </el-table-column>
+            <el-table-column prop="text" label="分类名">
+            </el-table-column>
+            <el-table-column label="排序">
+              <template slot-scope="scope">
+                <ListSortEditor v-model="tplModel.categoryList" :index="scope.$index" :btns="{top:{enabled:false}, bottom:{enabled:false}}">
+                  <template v-slot:up="sc">
+                      <div><span>UP</span></div>
+          </template>
+                  <template v-slot:down="sc">
+                      <div><span>DOWN</span></div>
+          </template>
+                </ListSortEditor>
+              </template>
+            </el-table-column>
+          </el-table>
+  </div>
+</template>
+<script type="text/javascript">
+import ListSortEditor from 'wbfc-vs-tpl-editor/components/list-sort-editor'
+export default {
+  components: {
+    ListSortEditor,
+  }
+  ...
+}
+</script>
+```
 
 ## Build Setup
 
