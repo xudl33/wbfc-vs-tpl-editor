@@ -21,7 +21,7 @@ Vue.use(WbfcVsTplEditor);
 3. 保存模板所需要的数据
 4. 完成
 
-以上流程可以查看 [Demo](https://github.com/xudl33/wbfc-vs-tpl-editor/examples) 或者 下载源码后 `npm run dev` 打开对应网页也可见到默认的demo页面
+以上流程可以查看 [Demo](https://github.com/xudl33/wbfc-vs-tpl-editor/tree/master/examples) 或者 下载源码后 `npm run dev` 打开对应网页也可见到默认的demo页面
 
 ## 如何制作一个编辑器
 在你的模板Vue文件中引入templete-binder和templete-editor(binder负责数据模型绑定，editor负责页面渲染), 模板Vue需要mixins(混入)binder。在页面中使用TempleteEditor， 绑定`v-model="tplModel" :tpl-form-elems="tplFormElems"`, 设置tplFormElems对应的表单元素数据，然后再将editor的插槽showComponent部分写入你的插件并绑定`v-model="componentModel"`即可。例：
