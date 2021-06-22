@@ -1,6 +1,14 @@
 <template>
   <div class="form-item" v-if="visable">
-    <el-form-item :label="value.label" v-if="value.name && itemType">
+    <el-form-item v-if="value.name && itemType" v-bind="mergeFormItemAttrs">
+      <template v-slot:label v-if="value.helps">
+        <slot :name="'form_item_label_' + value.name" :data="value">
+          <el-link icon="el-icon-question" :underline="false" title="点击查看说明" @click="drawerShow = true"></el-link> {{value.label}}
+          <el-drawer :title="'帮助 - ' + value.label" :visible.sync="drawerShow" :append-to-body="true">
+            <pre style="padding:20px;">{{value.helps}}</pre>
+          </el-drawer>
+        </slot>
+      </template>
       <slot :name="'form_item_' + value.name" :data="value">
         <!-- 隐藏 -->
         <input type="hidden" v-model="binForm[value.name]" v-if="'hidden' === itemType" v-bind="value.attrs" v-on="value.events?value.events:null" />
@@ -50,7 +58,7 @@
           <el-cascader v-model="binForm[value.name]" v-bind="value.attrs" v-on="value.events?value.events:null"></el-cascader>
         </div>
         <!-- 输入框/文本框 -->
-        <el-input v-else-if="'input' === itemType" v-model="binForm[value.name]" v-bind="value.attrs" v-on="value.events?value.events:null"></el-input>
+        <el-input v-else-if="'input' === itemType" v-model="binForm[value.name]" v-bind="value.attrs" v-on="value.events?value.events:null" ></el-input>
         <!-- 开关 -->
         <el-switch v-else-if="'switch' === itemType" v-model="binForm[value.name]" v-bind="value.attrs" v-on="value.events?value.events:null">
         </el-switch>
@@ -127,7 +135,12 @@ export default {
     itemType() {
       return this.value.type ? this.value.type.toLowerCase() : null;
     },
-
+    mergeFormItemAttrs(){
+      // 合并form表单props
+      var props = {label: this.value.label, prop: this.value.name};
+      _.merge(props, this.value.formItemAttrs);
+      return props;
+    }
   },
   methods: {
 

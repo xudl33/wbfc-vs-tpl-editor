@@ -22,6 +22,9 @@
                 </slot>
                 <div v-for="(gm, i) in item.elems" :key="'tplForm_group_' + index + '_' + i">
                   <FormItemEditor :binForm="value" :value="gm" :visable="isVisible(gm.visible)">
+                    <template :slot="'form_item_label_' + item.name">
+                      <slot :name="'form_item_label_' + item.name" :data="item"></slot>
+                    </template>
                     <template :slot="'form_item_' + gm.name">
                       <slot :name="'form_item_' + gm.name" :data="gm"></slot>
                     </template>
@@ -33,6 +36,9 @@
               </template>
               <template v-else>
                 <FormItemEditor :binForm="value" :value="item" :visable="isVisible(item.visible)">
+                  <template :slot="'form_item_label_' + item.name">
+                    <slot :name="'form_item_label_' + item.name" :data="item"></slot>
+                  </template>
                   <template :slot="'form_item_' + item.name">
                     <slot :name="'form_item_' + item.name" :data="item"></slot>
                   </template>
@@ -133,7 +139,8 @@ export default {
     }
   },
   created(){
-
+    //console.log("%s.$scopedSlots = %o", 'TempleteEditor', this.$scopedSlots);
+    //console.log("%s.$slots = %o", 'TempleteEditor', this.$slots);
   }
 }
 </script>

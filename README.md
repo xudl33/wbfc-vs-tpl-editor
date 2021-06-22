@@ -110,10 +110,12 @@ bind|绑定名称 若带有'.'则会绝对匹配，不带'.'则会相对匹配 �
 label|元素显示标签|String|否|-|-
 visible|元素是否显示 String会按照表达式处理 可以指定为模型的其他属性 例: tplFormElems = [{type: 'switch', name:'textFlag', label:'开关', defVal: true}, {name:'textVal', label:'文字显示联动开关属性', visible: 'textFlag'}]|[String:expression]/boolean/function|否|-|true
 defVal|元素默认值 如果模型(value)不指定默认值，也可以通过tplFormElems的这个属性设置|Object|否|-|-
+formItemAttrs|表单项属性 EL组件具体参数说明请参考 [Element UI](https://element.eleme.cn/#/zh-CN/component/form#form-item-attributes)|Object|否|-|-
 attrs|元素属性 EL组件具体参数说明请参考 [Element UI](https://element.eleme.cn/#/zh-CN/component/installation)|Object|否|-|-
 events|元素事件|Object|否|请参考HTML的基础事件和自定义事件|-
 items|子元素列表  type=radio/radio-group/checkbox-group/select 时有效|TplFormElems|否|-|-
 text| 子元素显示标签  type=radio/radio-group/checkbox/checkbox-group/ 时有效|String|否|-|-
+helps|元素帮助文档|String|否|--
 
 ### TplFormElems-Group
 参数|说明|类型|必填|可选值|默认值
@@ -130,6 +132,7 @@ showComponent|编辑模式下显示的组件|-
 `'form_group_' + name + '_bottom'`|分组模块的尾分割线 默认不显示|data：tplFormElems[index]
 `'bottomBtns_' + index`|编辑器最底部按钮|data:bottomBtns
 `'form_item_' + name`|元素组件|data:TplFormElems[index]
+`'form_item_label_' + name`|元素标签|data:TplFormElems[index]
 
 ## 自定义组件
 在一些更为复杂的页面中，可能el提供的这些UI组件无法满足你的需求，这样的情况可以使用自定义组件。自定义组件分为：全局组件、编辑器全局组件、局部组件和局部完全自定义组件。

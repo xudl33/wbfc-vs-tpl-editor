@@ -40,9 +40,14 @@ export default {
       isEdit: true,
       componentModelStr: '',
       tplForm: {
-        rules: {
-
-        },
+        // 可以在tplForm中写rules总体校验，也可以在tplFormElems[].formItemAttrs中单独写校验
+        // rules: {
+        //   textVal:[{
+        //     "required": true,
+        //     "message": "请输入分组表单文本",
+        //     "trigger": "blur"
+        //   }]
+        // },
         bottomBtns: [{
           type: 'primary',
           label: '打印模板数据到控制台',
@@ -91,6 +96,14 @@ export default {
           type: 'input',
           name: 'textVal',
           label: '分组表单文本',
+          formItemAttrs:{
+            rules: [{
+                "required": true,
+                "message": "请输入分组表单文本",
+                "trigger": "blur"
+              }],
+              inlineMessage: true
+          },  
           attrs: {
             placeholder: '请输入'
           }
