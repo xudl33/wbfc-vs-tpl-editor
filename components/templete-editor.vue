@@ -21,7 +21,7 @@
                   <el-divider>{{item.group.label}}</el-divider>
                 </slot>
                 <div v-for="(gm, i) in item.elems" :key="'tplForm_group_' + index + '_' + i">
-                  <FormItemEditor :binForm="value" :value="gm" :visable="isVisible(gm.visible)">
+                  <FormItemEditor :binForm="value" :value="gm" :visable="isVisible(gm.visible)" :key="'form_item_editor_group_' + index + '_' + gm.name">
                     <template :slot="'form_item_label_' + item.name">
                       <slot :name="'form_item_label_' + item.name" :data="item"></slot>
                     </template>
@@ -35,7 +35,7 @@
                 </slot>
               </template>
               <template v-else>
-                <FormItemEditor :binForm="value" :value="item" :visable="isVisible(item.visible)">
+                <FormItemEditor :binForm="value" :value="item" :visable="isVisible(item.visible)" :key="'form_item_editor' + item.name">
                   <template :slot="'form_item_label_' + item.name">
                     <slot :name="'form_item_label_' + item.name" :data="item"></slot>
                   </template>
