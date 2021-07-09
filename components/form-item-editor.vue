@@ -109,6 +109,11 @@ export default {
   ],
   components: {
   },
+  data(){
+    return {
+      drawerShow: false
+    };
+  },
   props: {
     binForm: {
       type: Object,
