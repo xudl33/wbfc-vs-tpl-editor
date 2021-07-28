@@ -34,7 +34,12 @@
         </div>
         <!-- 多选按钮 -->
         <div v-else-if="'checkbox' === itemType">
-          <el-checkbox v-model="binForm[value.name]" v-bind="value.attrs" v-on="value.events?value.events:null">{{value.text}}</el-checkbox>
+          <div v-if="value.items && value.items.length > 0">
+            <el-checkbox v-for="(item, index) in value.items" :key="value.name + index" v-model="binForm[value.name]" v-bind="item.attrs" v-on="value.events?value.events:null">{{item.text}}</el-checkbox>
+          </div>
+          <div v-else>
+            <el-checkbox v-model="binForm[value.name]" v-bind="value.attrs" v-on="value.events?value.events:null">{{value.text}}</el-checkbox>
+          </div>
         </div>
         <!-- 多选按钮组 -->
         <div v-else-if="'checkbox-group' === itemType">
@@ -85,6 +90,7 @@
         <!-- 链接 -->
         <LinkEditor v-else-if="'link-editor' === itemType" v-bind="value.attrs" v-model="binForm[value.name]" v-on="value.events?value.events:null"></LinkEditor>
         <!-- 完全自定义组件 -->
+        <!-- 局部自定义组件'custom' === itemType 需要实现插槽这里不用div占位 -->
         <!-- <div v-else-if="'custom' === itemType" :data="value"></div> -->
         <!-- 自定义组件 html原生的控件的绑定 都需要用props修饰器才能正常使用 可以参考 https://cn.vuejs.org/v2/api/#v-bind -->
         <!-- 自定义组件的v-model https://cn.vuejs.org/v2/guide/components-custom-events.html#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BB%84%E4%BB%B6%E7%9A%84-v-model -->

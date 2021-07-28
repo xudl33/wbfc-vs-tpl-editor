@@ -139,7 +139,7 @@ export default {
         }]
       }, {
         type: 'radio-group',
-        name: 'radioGroupVal',
+        name: 'radioBtnGroupVal',
         label: '单选按钮组方形',
         items: [{
           type: 'radio-button', // 只要组内第一个是button样式 ，所有的都是
@@ -174,8 +174,9 @@ export default {
         }]
       }, {
         type: 'checkbox-group',
-        name: 'checkboxGroupVal',
+        name: 'checkboxBtnGroupVal',
         label: '多选按钮组方形',
+        defVal: [], // 不知道为什么element-ui的checkbox-btn如果不给model赋值，就会报错，只有这一个组件有问题，估计是bug
         items: [{
           type: 'checkbox-button', // 只要组内第一个是button样式 ，所有的都是
           attrs: { label: '0' },
