@@ -111,6 +111,7 @@ label|元素显示标签|String|否|-|-
 visible|元素是否显示 String会按照表达式处理 可以指定为模型的其他属性 例: tplFormElems = [{type: 'switch', name:'textFlag', label:'开关', defVal: true}, {name:'textVal', label:'文字显示联动开关属性', visible: 'textFlag'}]|[String:expression]/boolean/function|否|-|true
 defVal|元素默认值 如果模型(value)不指定默认值，也可以通过tplFormElems的这个属性设置|Object|否|-|-
 formItemAttrs|表单项属性 EL组件具体参数说明请参考 [Element UI](https://element.eleme.cn/#/zh-CN/component/form#form-item-attributes)|Object|否|-|-
+notMapping|编辑器表单组件模型值不需要映射到显示组件component中|boolean|否|true/false|false
 attrs|元素属性 EL组件具体参数说明请参考 [Element UI](https://element.eleme.cn/#/zh-CN/component/installation)|Object|否|-|-
 events|元素事件|Object|否|请参考HTML的基础事件和自定义事件|-
 items|子元素列表  type=radio/radio-group/checkbox-group/select 时有效|TplFormElems|否|-|-
@@ -122,6 +123,7 @@ helps|元素帮助文档|String|否|--
 ---|---|---|---|---|---
 name|分组的标识|String|是|-|null
 label|分组的文字显示，会在分割线正中间显示的提示文字|String|是|-|null
+visible|分组是否显示(如果该项为false，其组内子项也不会显示)|boolean|否|true/false|true
 
 ### TempleteEditor  - Slotes
 插槽名|说明|参数
@@ -375,7 +377,7 @@ export default {
 参数|说明|类型|必填|可选值|默认值
 ---|---|---|---|---|---
 value|需要排序的列表|Array|true|-|-
-index|当前值索引|int|true|-|-
+index|当前数据的索引值，上下排序是会根据索引值计算，因此必须为大于等于0的正数，一般会传入列表的index属性，详情可以参考示例。|int|true|+\[0-Number.MAX_SAFE_INTEGER\]|-
 btns|排序按钮|Object|false|-|{up: {type: 'text',icon: 'el-icon-arrow-up',title: '向上移动',enabled: true},down: {type: 'text',title: '向下移动',icon: "el-icon-arrow-down",enabled: true},top: {type: 'text',title: '移动到最前',icon: "el-icon-top",enabled: true},bottom: {type: 'text',title: '移动到最后',icon: "el-icon-bottom",enabled: true}}
 loop|是否循环排序 默认列表的第一个点击【向上移动】不会有效果，列表的最后一个点击【向下移动】也不会有效果。 如果开启该项，列表的第一个点击【向上移动】会变成最后一个，列表的最后一个点击【向下移动】会变成第一个|Boolean|false|true/false|false
 
@@ -395,6 +397,10 @@ down|向下移动|index:index
 top|移动到最前|index:index
 bottom|移动到最后|index:index
 
+#### 事件
+参数|说明
+---|---
+change|四个按钮，【向上移动】【向下移动】【移动到最前】【移动到最后】中的任何一个按钮执行操作后，均会触发change事件。
 
 #### 不显示按钮
 设置`btns`属性可以控制按钮是否可见。例： 不显示【移动到最前】【移动到最后】两个按钮。
