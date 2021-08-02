@@ -87,7 +87,8 @@ export default {
     loop: {
       type: Boolean,
       default: false
-    }
+    },
+
   },
   computed: {
     mergeBtns() {
@@ -112,11 +113,15 @@ export default {
           if (doVal < 0) {
             // shift把数组的第一个元素从其中删除，并返回第一个元素的值
             this.value.push(this.value.shift());
+            // 触发change事件
+            this.$emit("change");
           }
           // 最后一个向下移动变成第一个
           if (doVal >= this.value.length) {
             // unshift 向数组的开头添加一个或更多元素，并返回新的长度。
             this.value.unshift(this.value.splice(this.index, 1)[0]);
+            // 触发change事件
+            this.$emit("change");
           }
           return;
         }
@@ -124,6 +129,8 @@ export default {
       }
       // 互换位置 [1, 2, 3] -> [1, 1, 3] -> [2, 1, 3]
       this.value[this.index] = this.value.splice(this.index + val, 1, this.value[this.index])[0];
+      // 触发change事件
+      this.$emit("change");
     },
     toTop() {
       // 已经是第一个不用动
@@ -132,6 +139,8 @@ export default {
       }
       // unshift 向数组的开头添加一个或更多元素，并返回新的长度。
       this.value.unshift(this.value.splice(this.index, 1)[0]);
+      // 触发change事件
+      this.$emit("change");
     },
     toBottom() {
       // 已经是最后一个不用动
@@ -140,6 +149,8 @@ export default {
       }
       // 移动到最后
       this.value.push(this.value.splice(this.index, 1)[0]);
+      // 触发change事件
+      this.$emit("change");
     }
   },
   created() {

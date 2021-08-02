@@ -92,6 +92,7 @@
         <!-- 完全自定义组件 -->
         <!-- 局部自定义组件'custom' === itemType 需要实现插槽这里不用div占位 -->
         <!-- <div v-else-if="'custom' === itemType" :data="value"></div> -->
+        <!-- 动态组件定义 https://cn.vuejs.org/v2/guide/components.html#%E5%8A%A8%E6%80%81%E7%BB%84%E4%BB%B6 -->
         <!-- 自定义组件 html原生的控件的绑定 都需要用props修饰器才能正常使用 可以参考 https://cn.vuejs.org/v2/api/#v-bind -->
         <!-- 自定义组件的v-model https://cn.vuejs.org/v2/guide/components-custom-events.html#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BB%84%E4%BB%B6%E7%9A%84-v-model -->
         <component v-else-if="'custom' !== itemType" v-bind:is="itemType" v-bind="value.attrs" v-model.props="binForm[value.name]" v-on="value.events?value.events:null"></component>

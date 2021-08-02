@@ -1,6 +1,6 @@
 {
   "name": "wbfc-vs-tpl-editor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "一个基于Element UI的可视化模版编辑器框架",
   "author": "xudalin <xudl@wisea.com.cn>",
   "private": false,

@@ -1,5 +1,10 @@
 ## 更新日志
 
+### 0.1.1
+
+*2021-08-02*
+
+- list-sort-editor增加change事件触发；templete-binder增加数据项删除的功能；修复group.visible=false时，子元素依然显示的问题；
 ### 0.1.0
 
 *2021-07-28*
