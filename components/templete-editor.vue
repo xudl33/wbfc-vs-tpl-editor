@@ -21,7 +21,7 @@
                                 <el-divider>{{item.group.label}}</el-divider>
                             </slot>
                             <div v-for="(gm, i) in item.elems" :key="'tplForm_group_' + index + '_' + i">
-                                <FormItemEditor :binForm="value" :value="gm" :visable="isVisible(item.group.visible) && isVisible(gm.visible)" :key="'form_item_editor_group_' + index + '_' + gm.name">
+                                <FormItemEditor :binForm="value" :value="gm" :visable="isVisible(item.group.visible) && isVisible(gm.visible)" :key="'form_item_editor_group_' + index + '_' + gm.name" :ref="'itemEditor_' + item.name">
                                     <template :slot="'form_item_label_' + item.name">
                                         <slot :name="'form_item_label_' + item.name" :data="item"></slot>
                                     </template>
@@ -35,7 +35,7 @@
                             </slot>
                         </template>
                         <template v-else>
-                            <FormItemEditor :binForm="value" :value="item" :visable="isVisible(item.visible)" :key="'form_item_editor' + item.name">
+                            <FormItemEditor :binForm="value" :value="item" :visable="isVisible(item.visible)" :key="'form_item_editor' + item.name" :ref="'itemEditor_' + item.name">
                                 <template :slot="'form_item_label_' + item.name">
                                     <slot :name="'form_item_label_' + item.name" :data="item"></slot>
                                 </template>
@@ -59,9 +59,9 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import _ from 'lodash'
-import FormItemEditor from './form-item-editor'
+import _isEmpty from 'lodash/isEmpty';
+import _merge from 'lodash/merge';
+import FormItemEditor from './form-item-editor';
 export default {
     name: 'TempleteEditor', // 模板编辑器
     components: {
@@ -106,7 +106,7 @@ export default {
         mergeTplForm() {
             // 合并form表单props
             var props = {};
-            _.merge(props, this.defTplForm, this.tplForm);
+            _merge(props, this.defTplForm, this.tplForm);
             return props;
         }
     },
@@ -124,7 +124,7 @@ export default {
                 return this.isVisible(express);
             }
 
-            let isEmpty = _.isEmpty(vis);
+            let isEmpty = _isEmpty(vis);
             if (isEmpty) {
                 return true;
             }
@@ -152,6 +152,12 @@ export default {
         },
         clearValidate(){
           this.$refs.tplForm.clearValidate();
+        },
+        getItemVue(name){
+            if(!name){
+                return;
+            }
+            return this.$refs['itemEditor_' + name];
         }
     },
     created() {

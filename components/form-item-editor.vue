@@ -107,7 +107,7 @@
   </div>
 </template>
 <script type="text/javascript">
-import Vue from 'vue';
+import _merge from 'lodash/merge';
 import FormItemComponentsManager from './form-item-components-manager';
 export default {
   name: 'FormItemEditor', // 表单编辑器
@@ -150,7 +150,7 @@ export default {
     mergeFormItemAttrs(){
       // 合并form表单props
       var props = {label: this.value.label, prop: this.value.name};
-      _.merge(props, this.value.formItemAttrs);
+      _merge(props, this.value.formItemAttrs);
       return props;
     }
   },

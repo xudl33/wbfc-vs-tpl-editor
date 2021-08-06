@@ -37,6 +37,7 @@
 
 </style>
 <script type="text/javascript">
+import _merge from 'lodash/merge';
 export default {
   name: 'ListSortEditor',
   data() {
@@ -94,7 +95,7 @@ export default {
     mergeBtns() {
       // 合并form表单props
       var props = {};
-      _.merge(props, this.defBtns, this.btns);
+      _merge(props, this.defBtns, this.btns);
       return props;
     }
   },

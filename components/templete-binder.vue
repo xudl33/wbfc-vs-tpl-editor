@@ -1,7 +1,10 @@
 <script>
-import Vue from 'vue'
-import _ from 'lodash'
-
+import _assign from 'lodash/assign';
+import _omit from 'lodash/omit';
+import _set from 'lodash/set';
+import _get from 'lodash/get';
+import _isEmpty from 'lodash/isEmpty';
+import _indexOf from 'lodash/indexOf';
 export default {
     name: 'TempleteBinder', // 模板和模型绑定组件
     data() {
@@ -16,11 +19,11 @@ export default {
     methods: {
         deepDelete(needDel, attr) {
             // 删除一个属性
-            needDel = _.omit(needDel, attr);
+            needDel = _omit(needDel, attr);
             // 如果上一层属性没有任何属性值 就连父属性一起删除
             if (attr.indexOf('.') > 0) {
                 let tempAttr = attr.substring(0, attr.lastIndexOf("."));
-                if (_.isEmpty(_.get(needDel, tempAttr))) {
+                if (_isEmpty(_get(needDel, tempAttr))) {
                     needDel = this.deepDelete(needDel, tempAttr);
                 }
             }
@@ -32,12 +35,12 @@ export default {
             if (attr.indexOf('.') > 0) {
                 let newVal = {};
                 // 修正带有层级的属性无法正确被设置到componentModel的问题
-                _.assign(newVal, this.componentModel);
-                _.set(newVal, attr, val);
-                Vue.set(this, 'componentModel', newVal);
+                _assign(newVal, this.componentModel);
+                _set(newVal, attr, val);
+                this.$set(this, 'componentModel', newVal);
             } else {
                 // 绑定属性
-                Vue.set(this.componentModel, attr, val);
+                this.$set(this.componentModel, attr, val);
 
             }
         },
@@ -74,15 +77,15 @@ export default {
             // 如果绑定属性名确定就执行绑定
             if (btr) {
                 // 模型层如果有值就不用设置了
-                let modelVal = _.get(this.tplModel, modelName);
+                let modelVal = _get(this.tplModel, modelName);
                 if (!modelVal) {
                     let defVal = elem.defVal;
                     // 如果有默认值的话 就直接绑定到模型上
                     if (defVal) {
-                        Vue.set(this.tplModel, modelName, defVal);
+                        this.$set(this.tplModel, modelName, defVal);
                     } else if (munalModelVal) {
                         // 如果模型和默认值都没有的情况下，如果手动设置了model也设置到模型中
-                        Vue.set(this.tplModel, modelName, munalModelVal);
+                        this.$set(this.tplModel, modelName, munalModelVal);
                     }
                 }
                 // 如果不进行映射的话 直接返回
@@ -127,7 +130,7 @@ export default {
                 elemIndex = elem;
             } else if (typeof elem === "object") {
                 // 如果是元素 就需要查询下标
-                elemIndex = _.indexOf(this.tplFormElems, elem);
+                elemIndex = _indexOf(this.tplFormElems, elem);
             }
 
             if (elemIndex != null && elemIndex > -1) {
