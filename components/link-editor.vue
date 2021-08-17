@@ -37,7 +37,7 @@
 </template>
 <script type="text/javascript">
 import 'element-ui/lib/theme-chalk/index.css'
-import _ from 'lodash'
+import _merge from 'lodash/merge';
 export default {
   name: 'LinkEditor',
   data() {
@@ -113,13 +113,13 @@ export default {
     mergeFormProps() {
       // 合并form表单props
       var props = {};
-      _.merge(props, this.defFormProps, this.formProps);
+     _merge(props, this.defFormProps, this.formProps);
       return props;
     },
     mergePropMapping(){
       // 合并form表单props
       var props = {};
-      _.merge(props, this.defPropMapping, this.propMapping);
+      _merge(props, this.defPropMapping, this.propMapping);
       return props;
     }
   },
