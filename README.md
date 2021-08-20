@@ -117,6 +117,11 @@ events|元素事件|Object|否|请参考HTML的基础事件和自定义事件|-
 items|子元素列表  type=radio/radio-group/checkbox-group/select 时有效|TplFormElems|否|-|-
 text| 子元素显示标签  type=radio/radio-group/checkbox/checkbox-group/ 时有效|String|否|-|-
 helps|元素帮助文档|String|否|--
+autoBind|自动绑定模型|boolean|否|true/false|true
+bindType|绑定类型 当autoBind=false时必填|String|否|'static'/'dynamic'|-
+bindFunc|自定义绑定函数 当autoBind=false时，bindType != 'static'/'dynamic'时必填|function|否|-|-
+invisibleNoBind|不显示时是否不绑定模型(会清空模型值)|boolean|否|true/false|false
+invisibleNoBindHoleModel|不显示且不绑定数据模型时 是否保留模型值|boolean|否|true/false|false
 
 ### TplFormElems-Group
 参数|说明|类型|必填|可选值|默认值
@@ -124,6 +129,15 @@ helps|元素帮助文档|String|否|--
 name|分组的标识|String|是|-|null
 label|分组的文字显示，会在分割线正中间显示的提示文字|String|是|-|null
 visible|分组是否显示(如果该项为false，其组内子项也不会显示)|boolean|否|true/false|true
+invisibleNoBind|不显示时是否不绑定模型(会清空模型值)|boolean|否|true/false|false
+invisibleNoBindHoleModel|不显示且不绑定数据模型时 是否保留模型值|boolean|否|true/false|false
+
+### TempleteEditor - Methods
+函数名|说明|参数|示例
+---|---|---|---
+addTplFormElems|添加一个tplFormElems的节点|item(一个节点), model(默认模型值)|vm.addTplFormElems({type: 'input', name: 'test', label:'测试输入框', bind: 'wbfc.test'}, '测试字符串');
+deleteElem|删除一个tplFormElems的节点|elem(节点), groupElem(elem的父节点，没有填为null))|vm.deleteElem({type: 'input', name: 'test', label:'测试输入框', bind: 'wbfc.test'})
+removeWatch|移除模型绑定|elem（节点非group）, holeModelVal(是否保留表单模型值)|vm.removeWatch({type: 'input', name: 'test', label:'测试输入框', bind: 'wbfc.test'})
 
 ### TempleteEditor  - Slotes
 插槽名|说明|参数

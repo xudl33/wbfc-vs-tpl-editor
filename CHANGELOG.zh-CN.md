@@ -1,4 +1,12 @@
 ## 更新日志
+### 0.1.4
+
+*2021-08-20*
+
+- 自定义组件增加一个props = item，item为tplFormElems的一个正常节点或一个group节点的elems中的一个
+- item增加autoBind、bindType、bindFunc、invisibleNoBind、invisibleNoBindHoleModel属性和功能
+- 修复templete-editor.getItemVue函数无法获取到子组件的bug
+
 ### 0.1.3
 
 *2021-08-17*
