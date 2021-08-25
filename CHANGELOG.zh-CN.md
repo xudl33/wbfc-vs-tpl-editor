@@ -1,4 +1,12 @@
 ## 更新日志
+### 0.1.5
+
+*2021-08-25*
+
+- 修正了某些非编辑器模式下无法正确回调toggleVisible的bug
+- 修改toggleVisible的方式 原为this.$parent触发，现在是form-item-editor触发
+- 合并`invisibleNoBind`和`invisibleNoBindHoleModel`选项为`invisibleNoBindType`
+
 ### 0.1.4
 
 *2021-08-20*

@@ -21,7 +21,7 @@
                                 <el-divider>{{item.group.label}}</el-divider>
                             </slot>
                             <div v-for="(gm, i) in item.elems" :key="'tplForm_group_' + index + '_' + i">
-                                <FormItemEditor :binForm="value" :value="gm" :visable="isVisibleWithInvisibleNoBind(gm.name, [item, gm])" :key="'form_item_editor_group_' + index + '_' + gm.name" :ref="'itemEditor_' + gm.name">
+                                <FormItemEditor :binForm="value" :value="gm" :visable="isVisible(item.group.visible) && isVisible(gm.visible)" :key="'form_item_editor_group_' + index + '_' + gm.name" :ref="'itemEditor_' + gm.name">
                                     <template :slot="'form_item_label_' + item.name">
                                         <slot :name="'form_item_label_' + item.name" :data="item"></slot>
                                     </template>
@@ -35,7 +35,7 @@
                             </slot>
                         </template>
                         <template v-else>
-                            <FormItemEditor :binForm="value" :value="item" :visable="isVisibleWithInvisibleNoBind(item.name, [item])" :key="'form_item_editor' + item.name" :ref="'itemEditor_' + item.name">
+                            <FormItemEditor :binForm="value" :value="item" :visable="isVisible(item.visible)" :key="'form_item_editor' + item.name" :ref="'itemEditor_' + item.name">
                                 <template :slot="'form_item_label_' + item.name">
                                     <slot :name="'form_item_label_' + item.name" :data="item"></slot>
                                 </template>
@@ -112,46 +112,6 @@ export default {
         }
     },
     methods: {
-        isVisibleWithInvisibleNoBind(itemName, preArray) {
-            // item, visibleArray, invisibleNoBind, invisibleNoBindHoleModel
-            if (!itemName || !preArray || preArray.length <= 0) {
-                return true;
-            }
-            let visibleArray = [];
-            let invisibleNoBind = false;
-            let invisibleNoBindHoleModel = false;
-            preArray.forEach(p => {
-                let vis = null;
-                if (p.group) {
-                    vis = p.group.visible;
-                    invisibleNoBind = invisibleNoBind || p.group.invisibleNoBind;
-                    invisibleNoBindHoleModel = invisibleNoBindHoleModel || p.group.invisibleNoBindHoleModel;
-                } else {
-                    vis = p.visible;
-                    invisibleNoBind = invisibleNoBind || p.invisibleNoBind;
-                    invisibleNoBindHoleModel = invisibleNoBindHoleModel || p.invisibleNoBindHoleModel;
-                }
-                visibleArray.push(vis);
-            });
-
-            let visable = true;
-            for (let i in visibleArray) {
-                visable = visable && this.isVisible(visibleArray[i]);
-            }
-
-            // 如果状态缓存中的标志和visable结果一致 就不用再调toggleVisible了 否则会出现无线循环的渲染调用
-            if (this.itemsVisible[itemName] === visable) {
-                return visable;
-            }
-            // 如果配置了可见性影响模型绑定的关系
-            if (invisibleNoBind) {
-                // 回调到binder 根据可见状态 改变绑定的数据模型和组件模型
-                this.$parent.toggleVisible(itemName, visable, invisibleNoBindHoleModel);
-                // 存储到状态缓存中
-                this.itemsVisible[itemName] = visable;
-            }
-            return visable;
-        },
         isVisible(vis) {
             let typ = typeof vis;
             // 如果是布尔值

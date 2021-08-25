@@ -4,6 +4,7 @@ import _omit from 'lodash/omit';
 import _set from 'lodash/set';
 import _get from 'lodash/get';
 import _isEmpty from 'lodash/isEmpty';
+import _isBoolean from 'lodash/isBoolean';
 import _findIndex from 'lodash/findIndex';
 export default {
     name: 'TempleteBinder', // 模板和模型绑定组件
@@ -47,8 +48,8 @@ export default {
         },
         addTplFormElems(item, model) {
             if (item) {
-                // 是否为自动bind
-                this.munalBindItem(item);
+                // 添加默认的绑定事件
+                this.addDefaultEvents(item);
                 // 添加到表单项数组中
                 this.tplFormElems.push(item);
                 // 添加监控 如果有模型也要添加模型
@@ -74,11 +75,6 @@ export default {
             // name属性不能为空
             if (!watchAttr) {
                 return false;
-            }
-            // 如果开启了手动绑定 就需要使用addToItem事件来进行绑定回调
-            if (elem.autoBind === false) {
-                // 手动绑定事件是否添加(如果是初始化或者非addTplElems函数调用)
-                this.munalBindItem(elem);
             }
 
             let btr = this.getBindAttrName(elem);
@@ -132,53 +128,34 @@ export default {
             } else {
                 this.addOneElemWatch(elem, munalModelVal);
             }
+            // 添加默认事件
+            this.addDefaultEvents(elem);
         },
-        toggleVisible(elemName, vis, invisibleNoBindHoleModel) {
-            if (elemName) {
-                let elem = null;
-                for (var i in this.tplFormElems) {
-                    let o = this.tplFormElems[i];
-                    if (o.group) {
-                        if (o.group.name === elemName) {
-                            elem = o;
-                            break;
-                        }
-                        for (var j in o.elems) {
-                            let k = o.elems[j];
-                            if (k.name === elemName) {
-                                elem = k;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (!elem) {
-                    return;
-                }
-                // 不可见时移除
-                if (vis === false) {
-                    if (typeof elem === "object") {
-                        // 带有group的需要循环
-                        if (elem.group) {
-                            for (var j in elem.elems) {
-                                let res = this.removeWatch(elem.elems[j], invisibleNoBindHoleModel);
-                                if (res === false) {
-                                    continue;
-                                }
-                            }
-                        } else {
-                            this.removeWatch(elem, invisibleNoBindHoleModel);
-                        }
-                    }
-                }
-                if (vis === true) {
-                    if (typeof elem === "object") {
-                        // 如果设置了保留值 removeWatch就不会删除 添加监控前会从model中重新获取
-                        this.addWatch(elem);
-                    }
+        toggleVisible(elem, vis, invisibleNoBindType) {
+            if (!elem) {
+                return;
+            }
+            let noBindType = false;
+            if (!_isEmpty(invisibleNoBindType) && typeof invisibleNoBindType === 'string') {
+                let type = invisibleNoBindType.toLocaleLowerCase();
+                // 除了holdtplmodel之外 都是false
+                if (type === 'holdtplmodel') {
+                    noBindType = true;
                 }
             }
+            // 不可见时移除
+            if (vis === false) {
+                if (typeof elem === "object") {
+                    this.removeWatch(elem, noBindType);
+                }
+            }
+            if (vis === true) {
+                if (typeof elem === "object") {
+                    // 如果设置了保留值 removeWatch就不会删除 添加监控前会从model中重新获取
+                    this.addWatch(elem);
+                }
+            }
+
         },
         deleteElem(elem, groupElem) {
             // 如果是某个节点内数据删除
@@ -317,10 +294,18 @@ export default {
             }
 
         },
-        munalBindItem(elem) {
-            let that = this;
+        addOneMunalBindEvents(elem, autoBind) {
             // 如果设置了自动绑定 就使用默认的绑定函数
-            if (elem.autoBind === false) {
+            let isAutoBind = true;
+            // 如果group设置了autoBind 优先级要更大
+            if (_isBoolean(autoBind)) {
+                isAutoBind = autoBind;
+            } else {
+                isAutoBind = elem.autoBind;
+            }
+
+            if (isAutoBind === false) {
+                //  如果开启了手动绑定 就需要使用addToItem事件来进行绑定回调
                 // 如果自定义事件不包括addToElems就主动添加一个
                 if (!elem.events || (elem.events && !elem.events.addToElems)) {
                     if (elem.events === null || elem.events === undefined) {
@@ -334,20 +319,59 @@ export default {
                         bindFunc = this.staticItem;
                     } else {
                         // 如果没有设置类型 就需要填写bindFunc
-                        if(typeof elem.bindFunc === 'function'){
+                        if (typeof elem.bindFunc === 'function') {
                             bindFunc = elem.bindFunc;
                         } else {
                             console.error('Elem = %o has no bindFunc', elem);
-                            return false;
                         }
                     }
-                    if(bindFunc){
+                    if (bindFunc) {
                         elem.events.addToElems = bindFunc;
-                        return true;
                     }
                 }
             }
-            return false;
+        },
+        addOneToggleVisibleEvents(elem, invisibleNoBindType) {
+            // 如果设置了自动绑定 就使用默认的绑定函数
+            let invisbleType;
+            // 如果group设置了invisibleNoBindType 优先级要更大
+            if (!_isEmpty(invisibleNoBindType)) {
+                invisbleType = invisibleNoBindType;
+            } else {
+                invisbleType = elem.invisibleNoBindType;
+            }
+            if (_isEmpty(invisibleNoBindType)) {
+                return;
+            }
+            // 添加事件
+            if (!elem.events || (elem.events && !elem.events.toggleVisible)) {
+                if (elem.events === null || elem.events === undefined) {
+                    elem.events = {};
+                }
+
+                elem.events.toggleVisible = (vis) => {
+                    this.toggleVisible(elem, vis, invisibleNoBindType);
+                };
+            }
+        },
+        addDefaultEvents(elem) {
+            if (!elem) {
+                return false;
+            }
+            // 带有group的需要循环
+            if (elem.group) {
+                for (var j in elem.elems) {
+                    // 添加手动绑定事件
+                    this.addOneMunalBindEvents(elem.elems[j], elem.group.autoBind);
+                    // 添加可见性绑定事件
+                    this.addOneToggleVisibleEvents(elem.elems[j], elem.group.invisibleNoBindType);
+                }
+            } else {
+                // 添加手动绑定事件
+                this.addOneMunalBindEvents(elem);
+                // 添加可见性绑定事件
+                this.addOneToggleVisibleEvents(elem);
+            }
         }
     },
     created() {
