@@ -1,12 +1,19 @@
 <template>
 <div class="form-item" v-show="visable">
     <el-form-item v-if="value.name && itemType" v-bind="mergeFormItemAttrs">
-        <template v-slot:label v-if="value.helps">
+        <template v-slot:label>
             <slot :name="'form_item_label_' + value.name" :data="value">
-                <el-link icon="el-icon-question" :underline="false" title="点击查看说明" @click="drawerShow = true"></el-link> {{value.label}}
-                <el-drawer :title="'帮助 - ' + value.label" :visible.sync="drawerShow" :append-to-body="true" :ref="'form_item_' + value.name">
-                    <pre style="padding:20px;">{{value.helps}}</pre>
-                </el-drawer>
+                <template v-if="value.helps">
+                    <slot :name="'form_item_label_helps_' + value.name" :data="value">
+                      <el-link icon="el-icon-question" :underline="false" title="点击查看说明" @click="drawerShow = true"></el-link> {{value.label}}
+                      <el-drawer :title="'帮助 - ' + value.label" :visible.sync="drawerShow" :append-to-body="true" :ref="'form_item_' + value.name">
+                          <pre style="padding:20px;">{{value.helps}}</pre>
+                      </el-drawer>
+                    </slot>
+                </template>
+                <template v-else>
+                  {{value.label}}
+                </template>
             </slot>
         </template>
         <slot :name="'form_item_' + value.name" :data="value">
@@ -95,7 +102,16 @@
             <!-- 动态组件定义 https://cn.vuejs.org/v2/guide/components.html#%E5%8A%A8%E6%80%81%E7%BB%84%E4%BB%B6 -->
             <!-- 自定义组件 html原生的控件的绑定 都需要用props修饰器才能正常使用 可以参考 https://cn.vuejs.org/v2/api/#v-bind -->
             <!-- 自定义组件的v-model https://cn.vuejs.org/v2/guide/components-custom-events.html#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BB%84%E4%BB%B6%E7%9A%84-v-model -->
-            <component v-else-if="'custom' !== itemType" v-bind:is="itemType" v-bind="value.attrs" v-model.props="binForm[value.name]" v-on="value.events?value.events:null" v-bind:item="value" :ref="'form_item_' + value.name"></component>
+            <component v-else-if="'custom' !== itemType" v-bind:is="itemType" v-bind="value.attrs" v-model.props="binForm[value.name]" v-on="value.events?value.events:null" v-bind:item="value" :ref="'form_item_' + value.name">
+                <template v-for="(s, i) in value.slots">
+                    <template v-if="s.name" :slot="s.name">
+                        <TemplateRender :key="'form_item_' + value.name + '_slot_' + s.name" :value="s" v-on="s.events?s.events:null" v-bind="s.attrs" v-bind:item="value" :ref="'form_item_slot_' + value.name"></TemplateRender>
+                    </template>
+                    <template v-else>
+                        <div v-html="s" :key="'form_item_' + value.name + '_slot_' + i"></div>
+                    </template>
+                </template>
+            </component>
         </slot>
     </el-form-item>
     <el-form-item :label="value.label" v-else>
@@ -110,13 +126,16 @@
 <script>
 import _merge from 'lodash/merge';
 import _isEmpty from 'lodash/isEmpty';
+import TemplateRender from './template-render';
 import FormItemComponentsManager from './form-item-components-manager';
 export default {
     name: 'FormItemEditor', // 表单编辑器
     mixins: [
         FormItemComponentsManager
     ],
-    components: {},
+    components: {
+      TemplateRender
+    },
     data() {
         return {
             drawerShow: false

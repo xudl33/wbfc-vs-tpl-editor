@@ -22,12 +22,10 @@
                             </slot>
                             <div v-for="(gm, i) in item.elems" :key="'tplForm_group_' + index + '_' + i">
                                 <FormItemEditor :binForm="value" :value="gm" :visable="isVisible(item.group.visible) && isVisible(gm.visible)" :key="'form_item_editor_group_' + index + '_' + gm.name" :ref="'itemEditor_' + gm.name">
-                                    <template :slot="'form_item_label_' + item.name">
-                                        <slot :name="'form_item_label_' + item.name" :data="item"></slot>
+                                    <template v-for="s in scopedSlotsList" :slot="s.name">
+                                        <slot :name="s.name" :data="gm" :group="item"></slot>
                                     </template>
-                                    <template :slot="'form_item_' + gm.name">
-                                        <slot :name="'form_item_' + gm.name" :data="gm"></slot>
-                                    </template>
+
                                 </FormItemEditor>
                             </div>
                             <slot :name="'form_group_' + item.group.name + '_bottom'" :data='item' v-if="isVisible(item.group.bottom?item.group.bottom.visible:false)">
@@ -36,11 +34,8 @@
                         </template>
                         <template v-else>
                             <FormItemEditor :binForm="value" :value="item" :visable="isVisible(item.visible)" :key="'form_item_editor' + item.name" :ref="'itemEditor_' + item.name">
-                                <template :slot="'form_item_label_' + item.name">
-                                    <slot :name="'form_item_label_' + item.name" :data="item"></slot>
-                                </template>
-                                <template :slot="'form_item_' + item.name">
-                                    <slot :name="'form_item_' + item.name" :data="item"></slot>
+                                <template v-for="s in scopedSlotsList" :slot="s.name">
+                                    <slot :name="s.name" :data="item"></slot>
                                 </template>
                             </FormItemEditor>
                         </template>
@@ -73,7 +68,7 @@ export default {
                 labelWidth: "30%", // 默认表单文字列宽
                 bottomBtns: []
             },
-            itemsVisible: {}, // 组件可见性
+            scopedSlotsList: [], // 插槽列表
         };
     },
     props: {
@@ -166,8 +161,17 @@ export default {
         }
     },
     created() {
+
         //console.log("%s.$scopedSlots = %o", 'TempleteEditor', this.$scopedSlots);
         //console.log("%s.$slots = %o", 'TempleteEditor', this.$slots);
+    },
+    mounted() {
+        // 初始化结束后将插槽列表向子组件传递
+        Object.keys(this.$scopedSlots).forEach(s => {
+            this.scopedSlotsList.push({
+                'name': s
+            });
+        });
     }
 }
 </script>

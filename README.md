@@ -121,6 +121,7 @@ autoBind|自动绑定模型|boolean|否|true/false|true
 bindType|绑定类型 当autoBind=false时必填|String|否|'static'/'dynamic'|-
 bindFunc|自定义绑定函数 当autoBind=false时，bindType != 'static'/'dynamic'时必填|function|否|-|-
 invisibleNoBindType|不显示时的绑定模式 all-既删除表单模型也删除组件模型 holdTplModel-只删除组件模型|String|否|`all`/`holdTplModel,`|all
+slots|插槽列表 默认插槽`["xxx"\]` 具名插槽`[{name:'xid', ....}]`|Array|否|-|-
 
 ### TplFormElems-Group
 参数|说明|类型|必填|可选值|默认值
@@ -129,6 +130,14 @@ name|分组的标识|String|是|-|null
 label|分组的文字显示，会在分割线正中间显示的提示文字|String|是|-|null
 visible|分组是否显示(如果该项为false，其组内子项也不会显示)|boolean|否|true/false|true
 invisibleNoBindType|不显示时的绑定模式 all-既删除表单模型也删除组件模型 holdTplModel-只删除组件模型|String|否|`all`/`holdTplModel,`|all
+
+### TplFormElems-slots
+参数|说明|类型|必填|可选值|默认值
+---|---|---|---|---|---
+name|具名插槽使用的名称,如果不填就是默认的default插槽|String|否|-|-
+component|组件 {template: ''} 模板字符串对应`<template>`节点 详情参考[Vue.js](https://cn.vuejs.org/v2/guide/syntax.html)|new Vue()|否|-|-
+params|组件的数据对象 详情参考[Vue.js - createElement-参数](https://cn.vuejs.org/v2/guide/render-function.html#createElement-%E5%8F%82%E6%95%B0)|Object|否|-|-
+VNodes|组件的子节点 一般为默认的插槽(this.$slots.default) 详情参考[Vue.js - 完整示例](https://cn.vuejs.org/v2/guide/render-function.html#%E5%AE%8C%E6%95%B4%E7%A4%BA%E4%BE%8B)|Object|否|-|-
 
 ### TempleteEditor - Methods
 函数名|说明|参数|示例
