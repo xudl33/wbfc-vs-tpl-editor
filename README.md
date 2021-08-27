@@ -116,7 +116,8 @@ attrs|元素属性 EL组件具体参数说明请参考 [Element UI](https://elem
 events|元素事件|Object|否|请参考HTML的基础事件和自定义事件|-
 items|子元素列表  type=radio/radio-group/checkbox-group/select 时有效|TplFormElems|否|-|-
 text| 子元素显示标签  type=radio/radio-group/checkbox/checkbox-group/ 时有效|String|否|-|-
-helps|元素帮助文档|String|否|--
+helps|元素帮助文档|String|否|-|-
+helpsType|元素帮助文档类型 如果填写为md 则会使用mavon-editor作为显示器 此时helps可以写为markdown格式文档|String|否|`md`|-
 autoBind|自动绑定模型|boolean|否|true/false|true
 bindType|绑定类型 当autoBind=false时必填|String|否|'static'/'dynamic'|-
 bindFunc|自定义绑定函数 当autoBind=false时，bindType != 'static'/'dynamic'时必填|function|否|-|-

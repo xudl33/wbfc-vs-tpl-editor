@@ -7,7 +7,8 @@
                     <slot :name="'form_item_label_helps_' + value.name" :data="value">
                       <el-link icon="el-icon-question" :underline="false" title="点击查看说明" @click="drawerShow = true"></el-link> {{value.label}}
                       <el-drawer :title="'帮助 - ' + value.label" :visible.sync="drawerShow" :append-to-body="true" :ref="'form_item_' + value.name">
-                          <pre style="padding:20px;">{{value.helps}}</pre>
+                          <mavon-editor  v-if="value && value.helpsType === 'md'"  :editable="false" :subfield="false" :toolbarsFlag="false" :scrollStyle="false" :ishljs = "false" defaultOpen="preview" v-model="value.helps"></mavon-editor>
+                          <div v-else id="form_item_label_helps_div" class="form_item_label_help" v-html="value.helps"></div>
                       </el-drawer>
                     </slot>
                 </template>
@@ -122,19 +123,26 @@
     </el-form-item>
 </div>
 </template>
-
+<style scoped>
+.form_item_label_help{
+  padding:20px;
+}
+</style>
 <script>
 import _merge from 'lodash/merge';
 import _isEmpty from 'lodash/isEmpty';
 import TemplateRender from './template-render';
 import FormItemComponentsManager from './form-item-components-manager';
+
+const mavonEditor = () => import('./async-mavon-editor');
 export default {
     name: 'FormItemEditor', // 表单编辑器
     mixins: [
         FormItemComponentsManager
     ],
     components: {
-      TemplateRender
+      TemplateRender,
+      mavonEditor,
     },
     data() {
         return {
@@ -187,7 +195,13 @@ export default {
     methods: {
         getVue() {
             return this.$refs['form_item_' + this.value.name];
-        }
+        },
+        // checkHelpsType(){
+        //   if(this.value && this.value.helpsType === 'md'){
+        //     import { mavonEditor } from 'mavon-editor';
+        //     this.components.mavonEditor = mavonEditor;
+        //   }
+        // }
     },
     created() {
         //console.log('form item editor = %o' , this)
@@ -200,6 +214,7 @@ export default {
         }*/
         //console.log("slots=%o", this.slots);
         //console.log("%s.$slots = %o", 'FormItemEditor', this.$slots);
+        //this.checkHelpsType();
 
     }
 }
