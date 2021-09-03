@@ -5,6 +5,9 @@
 
 - 增加了group.elems节点无限嵌套的功能；
 - 修正了由于elems节点无限嵌套带来的数据结构和解析的一系列问题；
+- 修正toggleVisible缺少无限嵌套判断的bug；
+- 增加toggleVisible事件的回调参数this；
+
 ### 0.1.6
 
 *2021-08-26*
