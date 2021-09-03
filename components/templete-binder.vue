@@ -131,7 +131,12 @@ export default {
             this.addDefaultEvents(elem);
         },
         toggleVisible(elem, vis, invisibleNoBindType) {
-            if (!elem) {
+            // 如果是字符串 有可能是path 就需要获取一下item
+            let doItem = elem;
+            if (typeof elem === "string") {
+                doItem = _get(this.tplFormElems, elem);
+            }
+            if (!doItem) {
                 return;
             }
             let noBindType = false;
@@ -144,14 +149,31 @@ export default {
             }
             // 不可见时移除
             if (vis === false) {
-                if (typeof elem === "object") {
-                    this.removeWatch(elem, noBindType);
+                if (typeof doItem === "object") {
+                    // 如果是分组就需要遍历
+                    if (doItem.group && doItem.elems) {
+                        // 遍历子元素
+                        doItem.elems.forEach((i) => {
+                            this.toggleVisible(i, vis, invisibleNoBindType);
+                        });
+                    } else {
+                        // 不是分组就移除监控
+                        this.removeWatch(doItem, noBindType);
+                    }
                 }
             }
             if (vis === true) {
-                if (typeof elem === "object") {
-                    // 如果设置了保留值 removeWatch就不会删除 添加监控前会从model中重新获取
-                    this.addWatch(elem);
+                if (typeof doItem === "object") {
+                    // 如果是分组就需要遍历
+                    if (doItem.group && doItem.elems) {
+                        // 遍历子元素
+                        doItem.elems.forEach((i) => {
+                            this.addWatch(i);
+                        });
+                    } else {
+                        // 如果设置了保留值 removeWatch就不会删除 添加监控前会从model中重新获取
+                        this.addWatch(doItem);
+                    }
                 }
             }
 
@@ -187,8 +209,8 @@ export default {
                     elemIndex = parseInt(path.replace('[', '').replace(']', ''));
                 } else {
                     // 不是根节点的话 说明是elems中的一个 只需要删除这个节点
-                  
-                  // 父级元素path
+
+                    // 父级元素path
                     let parentPath = path.substring(0, path.lastIndexOf('['));
                     // 元素的下标
                     let groupIndex = parseInt(path.substring(path.lastIndexOf('[') + 1, path.lastIndexOf(']')));

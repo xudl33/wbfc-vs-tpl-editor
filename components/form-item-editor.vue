@@ -198,7 +198,7 @@ export default {
                     if (Array.isArray(res)) {
                         vm = res[0];
                     }
-                    vm.$emit('toggleVisible', val);
+                    vm.$emit('toggleVisible', val, this);
                 });
             }
         }
