@@ -5,9 +5,10 @@ import _set from 'lodash/set';
 import _get from 'lodash/get';
 import _isEmpty from 'lodash/isEmpty';
 import _isBoolean from 'lodash/isBoolean';
-import _findIndex from 'lodash/findIndex';
+import TempleteBase from './templete-base';
 export default {
     name: 'TempleteBinder', // 模板和模型绑定组件
+    extends: TempleteBase,
     data() {
         return {
             tplModel: {}, // 编辑器数据模型
@@ -120,10 +121,8 @@ export default {
             // 带有group的需要循环
             if (elem.group) {
                 for (var j in elem.elems) {
-                    let res = this.addOneElemWatch(elem.elems[j], munalModelVal);
-                    if (res === false) {
-                        continue;
-                    }
+                    let item = elem.elems[j];
+                    this.addWatch(item, munalModelVal);
                 }
             } else {
                 this.addOneElemWatch(elem, munalModelVal);
@@ -157,62 +156,76 @@ export default {
             }
 
         },
-        deleteElem(elem, groupElem) {
-            // 如果是某个节点内数据删除
-            if (groupElem) {
-                if (!typeof elem === "object" || !typeof groupElem === "object") {
+        deleteElem(elem) {
+            // 如果是整个节点删除
+            let elemIndex = null;
+
+            // 如果是下标 就直接使用
+            if (typeof elem === 'number') {
+                elemIndex = elem;
+
+            } else if (typeof elem === "object") {
+                // 如果是元素 就需要查询
+                let name = elem.name;
+                // 如果是组节点要用组的名称
+                if (elem.group) {
+                    name = elem.group.name;
+                }
+                // 查询节点访问路径
+                let path = this.getNodePathByName(this.tplFormElems, name);
+                // 如果是空的就是没有找到
+                if (_isEmpty(path)) {
                     return;
                 }
-                let groupIndex = _findIndex(this.tplFormElems, {
-                    'group': {
-                        'name': groupElem.group.name
-                    }
-                });
-                let elemIndex = _findIndex(this.tplFormElems[groupIndex].elems, {
-                    'name': elem.name
-                });
-                if (elemIndex != null && elemIndex > -1) {
-                    let res = this.removeWatch(this.tplFormElems[groupIndex].elems[elemIndex]);
-                    this.tplFormElems[groupIndex].elems.splice(elemIndex, 1);
+                // 如果是组节点 path要替换掉最后的.group
+                if (elem.group) {
+                    path = path.substring(0, path.lastIndexOf('.group'));
                 }
-            } else {
-                // 如果是整个节点删除
-                let elemIndex = null;
-                // 如果是下标 就直接使用
-                if (typeof elem === 'number') {
-                    elemIndex = elem;
-                } else if (typeof elem === "object") {
-                    // 如果是元素 就需要查询下标
-                    let findPre = null;
-                    if (elem.group) {
-                        findPre = {
-                            'group': {
-                                'name': elem.group.name
-                            }
-                        };
-                    } else {
-                        findPre = {
-                            'name': elem.name
-                        };
-                    }
-                    elemIndex = _findIndex(this.tplFormElems, findPre);
-                }
+                // 如果包含.说明不是根节点
+                if (path.indexOf('.') < 0) {
+                    // 路径中的一个[N] N就是根节点的下标
+                    elemIndex = parseInt(path.replace('[', '').replace(']', ''));
+                } else {
+                    // 不是根节点的话 说明是elems中的一个 只需要删除这个节点
+                  
+                  // 父级元素path
+                    let parentPath = path.substring(0, path.lastIndexOf('['));
+                    // 元素的下标
+                    let groupIndex = parseInt(path.substring(path.lastIndexOf('[') + 1, path.lastIndexOf(']')));
+                    // 获取父级
+                    let parentItem = _get(this.tplFormElems, parentPath);
 
-                if (elemIndex && elemIndex > -1) {
-                    let delElem = this.tplFormElems[elemIndex];
-                    // 带有group的需要循环
-                    if (delElem.group) {
-                        for (var j in delElem.elems) {
-                            let res = this.removeWatch(delElem.elems[j]);
-                            if (res === false) {
-                                continue;
-                            }
+                    // 如果是group的话 就需要递归删除
+                    if (elem.group) {
+                        // 遍历子元素删除
+                        for (var j in elem.elems) {
+                            this.deleteElem(elem.elems[j]);
                         }
+                        // 删除元素
+                        parentItem.splice(groupIndex, 1);
                     } else {
-                        this.removeWatch(delElem);
+                        // 移除绑定
+                        this.removeWatch(elem);
+                        // 删除元素
+                        parentItem.splice(groupIndex, 1);
                     }
-                    this.tplFormElems.splice(elemIndex, 1);
                 }
+            }
+            // 如果下标大与-1 就是需要删除根节点
+            if (elemIndex && elemIndex > -1) {
+                let delElem = this.tplFormElems[elemIndex];
+                // 带有group的需要循环
+                if (delElem.group) {
+                    for (var j in delElem.elems) {
+                        let res = this.removeWatch(delElem.elems[j]);
+                        if (res === false) {
+                            continue;
+                        }
+                    }
+                } else {
+                    this.removeWatch(delElem);
+                }
+                this.tplFormElems.splice(elemIndex, 1);
             }
         },
         removeWatch(elem, holeModelVal) {
@@ -354,23 +367,35 @@ export default {
                 };
             }
         },
-        addDefaultEvents(elem) {
+        addDefaultEvents(elem, groupAutoBind, groupInvisibleNoBindType) {
             if (!elem) {
                 return false;
             }
+            let gab;
+            let gibt;
+            if (typeof groupAutoBind === 'boolean') {
+                gab = groupAutoBind;
+            }
+            if (!_isEmpty(groupInvisibleNoBindType)) {
+                gibt = groupInvisibleNoBindType;
+            }
             // 带有group的需要循环
             if (elem.group) {
+                if (typeof gab !== 'boolean') {
+                    gab = elem.group.autoBind;
+                }
+                if (_isEmpty(gibt)) {
+                    gibt = elem.group.invisibleNoBindType;
+                }
+                // 递归调用
                 for (var j in elem.elems) {
-                    // 添加手动绑定事件
-                    this.addOneMunalBindEvents(elem.elems[j], elem.group.autoBind);
-                    // 添加可见性绑定事件
-                    this.addOneToggleVisibleEvents(elem.elems[j], elem.group.invisibleNoBindType);
+                    this.addDefaultEvents(elem.elems[j], gab, gibt);
                 }
             } else {
                 // 添加手动绑定事件
-                this.addOneMunalBindEvents(elem);
+                this.addOneMunalBindEvents(elem, gab);
                 // 添加可见性绑定事件
-                this.addOneToggleVisibleEvents(elem);
+                this.addOneToggleVisibleEvents(elem, gibt);
             }
         }
     },

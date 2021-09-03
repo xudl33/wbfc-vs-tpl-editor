@@ -5,15 +5,15 @@
             <slot :name="'form_item_label_' + value.name" :data="value">
                 <template v-if="value.helps">
                     <slot :name="'form_item_label_helps_' + value.name" :data="value">
-                      <el-link icon="el-icon-question" :underline="false" title="点击查看说明" @click="drawerShow = true"></el-link> {{value.label}}
-                      <el-drawer :title="'帮助 - ' + value.label" :visible.sync="drawerShow" :append-to-body="true" :ref="'form_item_' + value.name">
-                          <mavon-editor  v-if="value && value.helpsType === 'md'"  :editable="false" :subfield="false" :toolbarsFlag="false" :scrollStyle="false" :ishljs = "false" defaultOpen="preview" v-model="value.helps"></mavon-editor>
-                          <div v-else id="form_item_label_helps_div" class="form_item_label_help" v-html="value.helps"></div>
-                      </el-drawer>
+                        <el-link icon="el-icon-question" :underline="false" title="点击查看说明" @click="drawerShow = true"></el-link> {{value.label}}
+                        <el-drawer :title="'帮助 - ' + value.label" :visible.sync="drawerShow" :append-to-body="true" :ref="'form_item_' + value.name">
+                            <mavon-editor v-if="value && value.helpsType === 'md'" :editable="false" :subfield="false" :toolbarsFlag="false" :scrollStyle="false" :ishljs="false" defaultOpen="preview" v-model="value.helps"></mavon-editor>
+                            <div v-else id="form_item_label_helps_div" class="form_item_label_help" v-html="value.helps"></div>
+                        </el-drawer>
                     </slot>
                 </template>
                 <template v-else>
-                  {{value.label}}
+                    {{value.label}}
                 </template>
             </slot>
         </template>
@@ -123,11 +123,13 @@
     </el-form-item>
 </div>
 </template>
+
 <style scoped>
-.form_item_label_help{
-  padding:20px;
+.form_item_label_help {
+    padding: 20px;
 }
 </style>
+
 <script>
 import _merge from 'lodash/merge';
 import _isEmpty from 'lodash/isEmpty';
@@ -141,8 +143,8 @@ export default {
         FormItemComponentsManager
     ],
     components: {
-      TemplateRender,
-      mavonEditor,
+        TemplateRender,
+        mavonEditor,
     },
     data() {
         return {
@@ -186,15 +188,29 @@ export default {
         }
     },
     watch: {
-        'visable': function (val) {
-            // 如果设置了不可见时不绑定 就需要回调到toggleVisible事件中
-            this.$refs['form_item_' + this.value.name].$emit('toggleVisible', val);
-
+        'visable': {
+            immediate: true,
+            handler: function (val) {
+                this.$nextTick(() => {
+                    // 如果设置了不可见时不绑定 就需要回调到toggleVisible事件中
+                    let res = this.$refs['form_item_' + this.value.name];
+                    let vm = res;
+                    if (Array.isArray(res)) {
+                        vm = res[0];
+                    }
+                    vm.$emit('toggleVisible', val);
+                });
+            }
         }
     },
     methods: {
         getVue() {
-            return this.$refs['form_item_' + this.value.name];
+            let res = this.$refs['form_item_' + this.value.name];
+            let vm = res;
+            if (Array.isArray(res)) {
+                vm = res[0];
+            }
+            return vm;
         },
         // checkHelpsType(){
         //   if(this.value && this.value.helpsType === 'md'){

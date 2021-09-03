@@ -15,30 +15,11 @@
             <div>
                 <el-form ref="tplForm" :model="value" v-bind="mergeTplForm" class="tpl-editor-form">
                     <template v-for="(item, index) in tplFormElems">
-                        <!-- 包含group就说明是分组类型 -->
-                        <template v-if="item.group">
-                            <slot :name="'form_group_' + item.group.name" :data='item' v-if="isVisible(item.group.visible)">
-                                <el-divider>{{item.group.label}}</el-divider>
-                            </slot>
-                            <div v-for="(gm, i) in item.elems" :key="'tplForm_group_' + index + '_' + i">
-                                <FormItemEditor :binForm="value" :value="gm" :visable="isVisible(item.group.visible) && isVisible(gm.visible)" :key="'form_item_editor_group_' + index + '_' + gm.name" :ref="'itemEditor_' + gm.name">
-                                    <template v-for="s in scopedSlotsList" :slot="s.name">
-                                        <slot :name="s.name" :data="gm" :group="item"></slot>
-                                    </template>
-
-                                </FormItemEditor>
-                            </div>
-                            <slot :name="'form_group_' + item.group.name + '_bottom'" :data='item' v-if="isVisible(item.group.bottom?item.group.bottom.visible:false)">
-                                <el-divider></el-divider>
-                            </slot>
-                        </template>
-                        <template v-else>
-                            <FormItemEditor :binForm="value" :value="item" :visable="isVisible(item.visible)" :key="'form_item_editor' + item.name" :ref="'itemEditor_' + item.name">
-                                <template v-for="s in scopedSlotsList" :slot="s.name">
-                                    <slot :name="s.name" :data="item"></slot>
-                                </template>
-                            </FormItemEditor>
-                        </template>
+                        <templete-form-items :item="item" v-model="value" :key="'tplForm_items_' + index" :ref="'tplForm_items_' + index">
+                            <template v-for="s in scopedSlotsList" :slot="s.name">
+                                <slot :name="s.name"></slot>
+                            </template>
+                        </templete-form-items>
                     </template>
                     <!-- 按钮组 -->
                     <el-form-item v-if="mergeTplForm.bottomBtns && mergeTplForm.bottomBtns.length > 0">
@@ -56,11 +37,13 @@
 <script>
 import _isEmpty from 'lodash/isEmpty';
 import _merge from 'lodash/merge';
-import FormItemEditor from './form-item-editor';
+import TempleteBase from './templete-base';
+import TempleteFormItems from './templete-form-items.vue';
 export default {
     name: 'TempleteEditor', // 模板编辑器
+    extends: TempleteBase,
     components: {
-        FormItemEditor
+        TempleteFormItems
     },
     data() {
         return {
@@ -107,32 +90,6 @@ export default {
         }
     },
     methods: {
-        isVisible(vis) {
-            let typ = typeof vis;
-            // 如果是布尔值
-            if ('boolean' === typ) {
-                return vis;
-            }
-
-            // 如果是表达式
-            if (typeof vis === 'function') {
-                let express = vis.call(this);
-                return this.isVisible(express);
-            }
-
-            let isEmpty = _isEmpty(vis);
-            if (isEmpty) {
-                return true;
-            }
-
-            // 如果是表达式
-            if (typeof vis === 'string') {
-                let express = this.value[vis];
-                return this.isVisible(express);
-            }
-
-            return true;
-        },
         getEditorForm() {
             return this.$refs.tplForm;
         },
@@ -153,9 +110,18 @@ export default {
             if (!name) {
                 return;
             }
-            let itemEditor = this.$refs['itemEditor_' + name];
+            let path = this.getNodePathByName(this.tplFormElems, name);
+            if (_isEmpty(path)) {
+                return;
+            }
+            let tempPath = path;
+            if (tempPath.indexOf('.') > -1) {
+                tempPath = path.substring(0, path.indexOf('.'));
+            }
+            let index = parseInt(tempPath.replace('[', '').replace(']', ''));
+            let itemEditor = this.$refs['tplForm_items_' + index];
             if (itemEditor && itemEditor[0]) {
-                return itemEditor[0].getVue();
+                return itemEditor[0].getVue(name);
             }
             return;
         }
