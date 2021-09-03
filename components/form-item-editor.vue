@@ -118,7 +118,7 @@
     <el-form-item :label="value.label" v-else>
         <!-- 如果不设置类型，默认为input -->
         <slot :name="value.name" :data="value" v-if="value.name">
-            <el-input v-model="binForm[value.name]" v-bind="value.attrs"></el-input>
+            <el-input v-bind="value.attrs" v-model="binForm[value.name]" v-on="value.events?value.events:null" v-bind:item="value" :ref="'form_item_' + value.name" ></el-input>
         </slot>
     </el-form-item>
 </div>
