@@ -91,16 +91,16 @@ export default {
 
             return true;
         },
-        getVue(name) {
+        getVue(name, refName) {
             if (!name) {
                 return;
             }
             let itemEditor = this.$refs['itemEditor_' + name];
             if (itemEditor) {
                 if (Array.isArray(itemEditor)) {
-                    return itemEditor[0].getVue();
+                    return itemEditor[0].getVue(refName);
                 }
-                return itemEditor.getVue();
+                return itemEditor.getVue(refName);
             }
             return;
         }

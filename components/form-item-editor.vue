@@ -104,13 +104,14 @@
             <!-- 自定义组件 html原生的控件的绑定 都需要用props修饰器才能正常使用 可以参考 https://cn.vuejs.org/v2/api/#v-bind -->
             <!-- 自定义组件的v-model https://cn.vuejs.org/v2/guide/components-custom-events.html#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BB%84%E4%BB%B6%E7%9A%84-v-model -->
             <component v-else-if="'custom' !== itemType" v-bind:is="itemType" v-bind="value.attrs" v-model.props="binForm[value.name]" v-on="value.events?value.events:null" v-bind:item="value" :ref="'form_item_' + value.name">
-                <template v-for="(s, i) in value.slots">
-                    <template v-if="s.name" :slot="s.name">
-                        <TemplateRender :key="'form_item_' + value.name + '_slot_' + s.name" :value="s" v-on="s.events?s.events:null" v-bind="s.attrs" v-bind:item="value" :ref="'form_item_slot_' + value.name"></TemplateRender>
-                    </template>
-                    <template v-else>
-                        <div v-html="s" :key="'form_item_' + value.name + '_slot_' + i"></div>
-                    </template>
+                <template v-for="s in scopedSlotsList" :slot="s.name" slot-scope="sc">
+                    <slot :name="s.name" :data="value" :slot-scope="sc"></slot>
+                </template>
+                <template v-for="(s, i) in value.slots" :slot="s.name" v-if="s.name" slot-scope="sc">
+                    <TemplateRender :key="'form_item_' + value.name + '_slot_' + s.name" :value="s" v-on="s.events?s.events:null" v-bind="s.attrs" v-bind:item="value" v-bind:sc="sc" :ref="'form_item_slot_' + value.name"></TemplateRender>
+                </template>
+                <template v-else>
+                    <div v-html="s" :key="'form_item_' + value.name + '_slot_' + i"></div>
                 </template>
             </component>
         </slot>
@@ -118,7 +119,7 @@
     <el-form-item :label="value.label" v-else>
         <!-- 如果不设置类型，默认为input -->
         <slot :name="value.name" :data="value" v-if="value.name">
-            <el-input v-bind="value.attrs" v-model="binForm[value.name]" v-on="value.events?value.events:null" v-bind:item="value" :ref="'form_item_' + value.name" ></el-input>
+            <el-input v-bind="value.attrs" v-model="binForm[value.name]" v-on="value.events?value.events:null" v-bind:item="value" :ref="'form_item_' + value.name"></el-input>
         </slot>
     </el-form-item>
 </div>
@@ -148,7 +149,8 @@ export default {
     },
     data() {
         return {
-            drawerShow: false
+            drawerShow: false,
+            scopedSlotsList: [], // 插槽列表
         };
     },
     props: {
@@ -204,8 +206,12 @@ export default {
         }
     },
     methods: {
-        getVue() {
-            let res = this.$refs['form_item_' + this.value.name];
+        getVue(refName) {
+            let rname = 'form_item_' + this.value.name;
+            if (refName) {
+                rname = refName;
+            }
+            let res = this.$refs[rname];
             let vm = res;
             if (Array.isArray(res)) {
                 vm = res[0];
@@ -232,6 +238,14 @@ export default {
         //console.log("%s.$slots = %o", 'FormItemEditor', this.$slots);
         //this.checkHelpsType();
 
+    },
+    mounted() {
+        // 初始化结束后将插槽列表向子组件传递
+        Object.keys(this.$scopedSlots).forEach(s => {
+            this.scopedSlotsList.push({
+                'name': s
+            });
+        });
     }
 }
 </script>

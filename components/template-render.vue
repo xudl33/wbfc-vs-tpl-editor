@@ -1,5 +1,6 @@
 <script>
 import Vue from 'vue';
+import _merge from 'lodash/merge';
 export default {
     name: 'TemplateRender',
     props: {
@@ -19,8 +20,20 @@ export default {
     },
     render: function (h) {
         // 创建构造器
-        let profile = Vue.extend(this.value.component || {});
+        let component = Object.assign({}, this.value.component);
+        let comData = {};
+        if (component.data && typeof component.data === 'function') {
+            comData = component.data();
+        }
+        _merge(component, {
+            data: () => {
+                return Object.assign(comData, this.$attrs);
+            }
+        });
+
+        let profile = Vue.extend(component || {});
         let params = Object.assign({}, this.value.params);
+
         // https://cn.vuejs.org/v2/guide/render-function.html#createElement-%E5%8F%82%E6%95%B0
         return this.$createElement(profile, params || {}, this.$scopedSlots);
     },

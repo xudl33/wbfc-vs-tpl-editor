@@ -106,7 +106,7 @@ export default {
         clearValidate() {
             this.$refs.tplForm.clearValidate();
         },
-        getItemVue(name) {
+        getItemVue(name, refName) {
             if (!name) {
                 return;
             }
@@ -121,7 +121,7 @@ export default {
             let index = parseInt(tempPath.replace('[', '').replace(']', ''));
             let itemEditor = this.$refs['tplForm_items_' + index];
             if (itemEditor && itemEditor[0]) {
-                return itemEditor[0].getVue(name);
+                return itemEditor[0].getVue(name, refName);
             }
             return;
         }
