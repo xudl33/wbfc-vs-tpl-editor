@@ -86,9 +86,9 @@ export default {
                 if (!modelVal) {
                     let defVal = elem.defVal;
                     // 如果有默认值的话 就直接绑定到模型上
-                    if (defVal) {
+                    if (defVal || _isBoolean(defVal)) {
                         this.$set(this.tplModel, modelName, defVal);
-                    } else if (munalModelVal) {
+                    } else if (munalModelVal || _isBoolean(munalModelVal)) {
                         // 如果模型和默认值都没有的情况下，如果手动设置了model也设置到模型中
                         this.$set(this.tplModel, modelName, munalModelVal);
                     }
