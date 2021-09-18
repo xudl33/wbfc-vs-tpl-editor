@@ -110,8 +110,8 @@
                 <template v-for="(s, i) in value.slots" :slot="s.name" v-if="s.name" slot-scope="sc">
                     <TemplateRender :key="'form_item_' + value.name + '_slot_' + s.name" :value="s" v-on="s.events?s.events:null" v-bind="s.attrs" v-bind:item="value" v-bind:sc="sc" :ref="'form_item_slot_' + value.name"></TemplateRender>
                 </template>
-                <template v-else>
-                    <div v-html="s" :key="'form_item_' + value.name + '_slot_' + i"></div>
+                <template v-if="value.slots && value.slots.length === 1&&typeof value.slots[0] === 'string'">
+                    <div v-html="value.slots[0]"></div>
                 </template>
             </component>
         </slot>
